@@ -1,0 +1,25 @@
+# Requirements for the Multi-Agent Systematic Review System
+
+# Core framework for building multi-agent systems and orchestrating workflows.
+langgraph
+
+# Official library for interacting with the OpenAI API (LLMs), as LLM (OpenAI API) is explicitly mentioned.
+openai
+
+# Python client for ChromaDB, essential for the ChromaDB (VectorStore) to store article chunks and enable semantic queries.
+chromadb
+
+# For generating text embeddings, such as the 'all-MiniLM-L6-v2' model mentioned in your diagram.
+sentence-transformers
+
+# A comprehensive toolkit for LLM development, including text splitters (for the Chunking Module), document loaders, and other utilities that facilitate working with LLMs and VectorStores.
+langchain
+
+# For extracting text from PDF articles, as indicated by the "Scientific Article (PDF/Full Text)" to "Text Extraction Module" flow.
+pypdf
+
+# Fundamental library for data manipulation, cleaning, exploration, and analysis in Python.
+pandas
+
+# Indispensable for handling .xlsx.
+openpyxl
