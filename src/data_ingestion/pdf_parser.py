@@ -1,15 +1,23 @@
-import pypdf
 import os
+import logging
+from typing import List, Dict
+from pypdf import PdfReader
 
 class PdfParser:
     """
-    A class to handle PDF parsing and text extraction.
+    A robust class to handle PDF parsing and text extraction from individual or multiple PDF files.
     """
-    def __init__(self):
-        # No specific initialization needed for pypdf, but could include logging setup
-        pass
 
-    def extract_text_from_pdf(self, pdf_path: str) -> list[dict]:
+    def __init__(self):
+        self.logger = logging.getLogger(self.__class__.__name__)
+        if not self.logger.handlers:
+            handler = logging.StreamHandler()
+            formatter = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s: %(message)s')
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
+            self.logger.setLevel(logging.INFO)
+
+    def extract_text_from_pdf(self, pdf_path: str) -> List[Dict]:
         """
         Extracts text from each page of a PDF and returns it with basic metadata.
 
@@ -17,48 +25,52 @@ class PdfParser:
             pdf_path (str): The full path to the PDF file.
 
         Returns:
-            list[dict]: A list of dictionaries, where each dictionary represents
-                        a page and contains 'page_content' (text) and 'page_number'.
-                        Example: [{'page_content': '...', 'page_number': 1}, ...]
+            List[Dict]: Each dict contains 'page_content', 'page_number', and 'file_path'.
         """
         if not os.path.exists(pdf_path):
             raise FileNotFoundError(f"PDF file not found at: {pdf_path}")
 
+        self.logger.info(f"Extracting text from: {pdf_path}")
         extracted_data = []
+
         try:
-            reader = pypdf.PdfReader(pdf_path)
-            num_pages = len(reader.pages)
+            reader = PdfReader(pdf_path)
             for i, page in enumerate(reader.pages):
                 page_text = page.extract_text()
-                if page_text: # Only add if text was successfully extracted
+                if page_text and page_text.strip():
                     extracted_data.append({
-                        'page_content': page_text,
-                        'page_number': i + 1, # Page numbers are 1-based
-                        'file_path': pdf_path # Include file path as metadata
+                        'page_content': page_text.strip(),
+                        'page_number': i + 1,
+                        'file_path': pdf_path
                     })
+            self.logger.info(f"Extracted {len(extracted_data)} pages from: {pdf_path}")
         except Exception as e:
-            print(f"Error extracting text from {pdf_path}: {e}")
-            # Depending on error handling strategy, could return an empty list or re-raise
+            self.logger.warning(f"Error extracting text from {pdf_path}: {e}")
             return []
+
         return extracted_data
 
-# Example Usage (for testing/demonstration)
-if __name__ == "__main__":
-    parser = PdfParser()
-    # Create a dummy PDF file for testing (or use a real one)
-    # Note: You would typically have real PDFs in data/raw_pdfs/
-    dummy_pdf_path = "data/raw_pdfs/example_article.pdf"
+    def extract_from_folder(self, folder_path: str) -> List[Dict]:
+        """
+        Extracts text from all PDFs within a given folder.
 
-    # For demonstration, let's create a placeholder for a PDF.
-    # In a real scenario, this PDF would already exist.
-    if not os.path.exists("data/raw_pdfs"):
-        os.makedirs("data/raw_pdfs")
-    # You would need an actual PDF file here to test.
-    # For now, let's assume `example_article.pdf` exists.
+        Args:
+            folder_path (str): Path to the directory containing PDF files.
 
-    # Example of how you would call it
-    # page_data = parser.extract_text_from_pdf(dummy_pdf_path)
-    # if page_data:
-    #     print(f"Extracted {len(page_data)} pages from {dummy_pdf_path}")
-    #     print(f"First page content snippet: {page_data['page_content'][:200]}...")
-    #     print(f"Metadata for first page: {page_data['page_number']}, {page_data['file_path']}")
+        Returns:
+            List[Dict]: Combined list of page-level dictionaries from all PDFs.
+        """
+        all_pages = []
+        if not os.path.isdir(folder_path):
+            raise NotADirectoryError(f"Provided path is not a directory: {folder_path}")
+
+        self.logger.info(f"Scanning folder: {folder_path}")
+
+        for file in os.listdir(folder_path):
+            if file.lower().endswith(".pdf"):
+                pdf_path = os.path.join(folder_path, file)
+                self.logger.info(f"Processing file: {pdf_path}")
+                all_pages.extend(self.extract_text_from_pdf(pdf_path))
+
+        self.logger.info(f"Total pages extracted from folder: {len(all_pages)}")
+        return all_pages

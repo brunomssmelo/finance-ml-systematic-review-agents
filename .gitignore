@@ -213,3 +213,4 @@ __marimo__/
 # project specific
 tmp/
 data/raw_pdfs
+pytest.ini
