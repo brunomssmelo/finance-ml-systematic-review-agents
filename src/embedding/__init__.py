@@ -1,0 +1,1 @@
+# Marks src.embedding as a Python package

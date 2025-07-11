@@ -212,5 +212,6 @@ __marimo__/
 
 # project specific
 tmp/
+sandbox/
 data/raw_pdfs
 pytest.ini

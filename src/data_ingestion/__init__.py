@@ -1,0 +1,1 @@
+# Marks src.data_ingestion as a Python package

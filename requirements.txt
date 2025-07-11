@@ -15,6 +15,9 @@ sentence-transformers
 # A comprehensive toolkit for LLM development, including text splitters (for the Chunking Module), document loaders, and other utilities that facilitate working with LLMs and VectorStores.
 langchain
 
+# Langchain-OpenAi API integration
+langchain_openai
+
 # For extracting text from PDF articles, as indicated by the "Scientific Article (PDF/Full Text)" to "Text Extraction Module" flow.
 pypdf
 
